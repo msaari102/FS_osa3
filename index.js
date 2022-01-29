@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
 var morgan = require('morgan')
+
+const Person = require('./models/person')
 
 morgan.token('body', function getBody (req) {
   if (req.method==="POST"){
@@ -47,13 +50,31 @@ let persons = [
     res.send(teksti)
   })
 
+  /*
   app.get('/api/persons', (req, res) => {
     res.json(persons)
-  })  
+  })
+  */
+ 
+  app.get('/api/persons', (request, response) => {
+    Person.find({}).then(persons => {
+      response.json(persons)
+    })
+  })
 
+  /*
   app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
+    if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
+  })
+  */
+  app.get('/api/persons/:id', (request, response) => {
+    Person.find(person => person.id === id)
     if (person) {
         response.json(person)
       } else {
@@ -71,12 +92,18 @@ let persons = [
   app.post('/api/persons/', (request, response) => {
     const body = request.body
     const id = Math.floor(Math.random() * 100000)
+    /*
     const person = {
         id: id,
         name: body.name,
         number: body.number
         
     }
+    */
+    const person = new Person({
+      name: body.name,
+      number: body.number
+    })
 
     if (!body.name) {
       return response.status(400).json({ 
@@ -95,10 +122,14 @@ let persons = [
         error: 'name must be unique' 
       })
     }
-
+    /*
     persons = persons.concat(person)
 
     response.json(person)
+    */
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
   })
 
   const PORT = process.env.PORT || 3001
