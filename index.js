@@ -53,12 +53,15 @@ let persons = [
   ]
 
   app.get('/info', (req, res, next) => {
-    const date = new Date()
-    const amount = Person.find({}).length
-    const teksti = '<p>Phonebook has info for ' + amount + ' persons</p>' + 
+    Person.countDocuments({}, function (err, count) {
+      const date = new Date()
+      const teksti = '<p>Phonebook has info for ' + count + ' persons</p>' + 
     '<p>' + date + '</p>'
+      res.send(teksti)
+    });
+    
 
-    res.send(teksti)
+    
   })
 
   /*
