@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
 const url = process.env.MONGODB_URI
@@ -17,12 +19,12 @@ const personSchema = new mongoose.Schema({
     minlength: 3,
     required: true
   },
-  number: { 
+  number: {
     type: String,
     minlength: 9,
     validate: {
       validator: function(v) {
-        return /^\d{2,3}-\d{5,}$/.test(v);
+        return /^\d{2,3}-\d{5,}$/.test(v)
       },
       message: props => `${props.value} is not a valid phone number!`
     }
