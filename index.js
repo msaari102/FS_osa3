@@ -52,9 +52,9 @@ let persons = [
     }
   ]
 
-  app.get('/info', (req, res) => {
+  app.get('/info', (req, res, next) => {
     const date = new Date()
-    const amount = persons.length
+    const amount = Person.length
     const teksti = '<p>Phonebook has info for ' + amount + ' persons</p>' + 
     '<p>' + date + '</p>'
 
@@ -67,7 +67,7 @@ let persons = [
   })
   */
  
-  app.get('/api/persons', (request, response) => {
+  app.get('/api/persons', (request, response, next) => {
     Person.find({}).then(persons => {
       response.json(persons)
     })
@@ -114,7 +114,7 @@ let persons = [
       .catch(error => next(error))
   })
 
-  app.post('/api/persons/', (request, response) => {
+  app.post('/api/persons/', (request, response, next) => {
     const body = request.body
     const id = Math.floor(Math.random() * 100000)
     /*
