@@ -54,7 +54,7 @@ let persons = [
 
   app.get('/info', (req, res, next) => {
     const date = new Date()
-    const amount = Person.length
+    const amount = Person.find({}).length
     const teksti = '<p>Phonebook has info for ' + amount + ' persons</p>' + 
     '<p>' + date + '</p>'
 
@@ -142,11 +142,13 @@ let persons = [
       })
     }
 
+    /*
     if (persons.filter(person => person.name === body.name).length > 0) {
       return response.status(400).json({ 
         error: 'name must be unique' 
       })
     }
+    */
     /*
     persons = persons.concat(person)
 
@@ -163,6 +165,12 @@ let persons = [
     const person = {
       name: body.name,
       number: body.number,
+    }
+
+    if (!body.number) {
+      return response.status(400).json({ 
+        error: 'number missing' 
+      })
     }
   
     Person.findByIdAndUpdate(request.params.id, person, { new: true })
