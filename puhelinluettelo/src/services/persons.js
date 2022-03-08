@@ -23,5 +23,3 @@ export default {
   update: update,
   remove: remove
 }
-
-/* https://fierce-thicket-98688.herokuapp.com/ */

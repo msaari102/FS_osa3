@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
+require('dotenv').config()
 var morgan = require('morgan')
 
 const Person = require('./models/person')
@@ -16,8 +16,9 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
+  } else if (error.name === 'IdError') {
+    return response.status(404).send({ error: 'id not found' })
   }
-
   next(error)
 }
 
@@ -28,10 +29,10 @@ morgan.token('body', function getBody (req) {
   return ' '
 })
 
-app.use(express.static('build'))
 app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+app.use(express.static('build'))
 
 /*
 let persons = [
@@ -64,11 +65,7 @@ app.get('/info', (req, res, next) => {
     const teksti = '<p>Phonebook has info for ' + count + ' persons</p>' +
     '<p>' + date + '</p>'
     res.send(teksti)
-      .catch(error => next(error))
   })
-
-
-
 })
 
 /*
@@ -94,15 +91,17 @@ app.get('/api/persons', (request, response) => {
       }
   })
   */
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
         response.json(person)
       } else {
-        response.status(404).end()
+        var e = new Error
+        e.name = 'IdError'
+        throw e
       }
-    })
+    }).catch(error => next(error))
 })
 
 /*
@@ -138,7 +137,7 @@ app.post('/api/persons/', (request, response, next) => {
     name: body.name,
     number: body.number
   })
-
+  /*
   if (!body.name) {
     return response.status(400).json({
       error: 'name missing'
@@ -150,7 +149,7 @@ app.post('/api/persons/', (request, response, next) => {
       error: 'number missing'
     })
   }
-
+*/
   /*
     if (persons.filter(person => person.name === body.name).length > 0) {
       return response.status(400).json({
@@ -176,13 +175,13 @@ app.put('/api/persons/:id', (request, response, next) => {
     name: body.name,
     number: body.number,
   }
-
+/*
   if (!body.number) {
     return response.status(400).json({
       error: 'number missing'
     })
   }
-
+*/
   Person.findByIdAndUpdate(request.params.id, person, { new: true })
     .then(updatedPerson => {
       response.json(updatedPerson)
